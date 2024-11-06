@@ -1,9 +1,12 @@
+import os
+import random
+from datetime import datetime
+
 import nextcord
 from nextcord import Interaction
-from nextcord.ext import commands, tasks
-from datetime import datetime
-import random
-import os
+from nextcord.ext import tasks, commands
+
+from keep_alive import keep_alive
 
 testServerId = 1
 
@@ -11,9 +14,10 @@ intents = nextcord.Intents.default()
 intents.messages = True
 intents.message_content = True
 
-bot = commands.Bot(command_prefix="dv ", intents=intents)
+bot = commands.Bot(command_prefix="/", intents=intents)
 
 
+# Discord Bot Events
 @bot.event
 async def on_ready():
     """Event triggered when the bot is ready and connected"""
@@ -23,18 +27,23 @@ async def on_ready():
         print(f'- {guild.name} (id: {guild.id})')
 
 
-@bot.slash_command(name='test', guild_ids=[testServerId])
+@bot.slash_command(name='ping')
+async def ping(interaction: Interaction):
+    await interaction.response.send_message('Pong! {0}'.format(round(bot.latency, 1)))
+
+
+@bot.slash_command(name='test')
 async def test(interaction: Interaction):
     await interaction.response.send_message("Hello, subscriber :)")
 
 
-@bot.slash_command(name='echo', guild_ids=[testServerId])
+@bot.slash_command(name='echo')
 async def echo(interaction: Interaction, *, message):
     """Repeats whatever the user says. Usage: !echo [message]"""
     await interaction.response.send_message(f'You said: {message}')
 
 
-@bot.slash_command(name='basic_embed', guild_ids=[testServerId])
+@bot.slash_command(name='basic_embed')
 async def basic_embed(ctx):
     """Sends a basic embed message"""
     embed = nextcord.Embed(
@@ -45,7 +54,7 @@ async def basic_embed(ctx):
     await ctx.send(embed=embed)
 
 
-@bot.slash_command(name='full_embed', guild_ids=[testServerId])
+@bot.slash_command(name='full_embed')
 async def full_embed(ctx):
     """Sends an embed with all common features"""
     embed = nextcord.Embed(
@@ -86,7 +95,7 @@ async def full_embed(ctx):
     await ctx.send(embed=embed)
 
 
-@bot.slash_command(name='profile_card', guild_ids=[testServerId])
+@bot.slash_command(name='profile_card')
 async def profile_card(ctx, member: nextcord.Member = None):
     """Creates a profile card for a user"""
     member = member or ctx.user
@@ -141,5 +150,9 @@ async def send_random_message():
 
 
 if __name__ == '__main__':
+
+    # Keep alive with thread
+    keep_alive()
+
     # Run the bot with the token
     bot.run(os.environ["DISCORD_TOKEN"])

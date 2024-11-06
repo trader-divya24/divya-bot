@@ -1,1 +1,6 @@
 nextcord
+fastapi
+uvicorn
+nest_asyncio
+uvloop
+flask
